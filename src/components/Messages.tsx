@@ -1,5 +1,3 @@
-'use client';
-
 import { TriangleAlert, CircleCheckBig, CircleAlert, CircleHelp, Loader2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 

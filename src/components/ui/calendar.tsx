@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-'use client';
-
 import { ptBR } from 'date-fns/locale';
 import dayjs from 'dayjs';
 import LocalePtBR from 'dayjs/locale/pt-br';
@@ -13,7 +11,7 @@ import { cn, firstLettersUpperCase } from '@/lib/utils';
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 export type IProps = { onYearClick?(): void } & CalendarProps;
 
-function Calendar({ className, classNames, showOutsideDays = true, ...props }: IProps) {
+function Calendar({ className, showOutsideDays = true, ...props }: IProps) {
   return (
     <DayPicker
       mode="single"

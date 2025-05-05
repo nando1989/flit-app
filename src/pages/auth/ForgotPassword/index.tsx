@@ -22,24 +22,34 @@ export const ForgotPassword = () => {
   };
 
   return (
-    <div>
-      <h1>Lembrar Senha</h1>
-      <Button
-        onClick={() => navigate(ROUTES.NO_AUTH.SIGN_IN)}
-        lefIcon={<ArrowLeft className="mr-2 size-4" />}
-        label="Voltar"
-        variant="link"
-      />
-      <form className="flex flex-col gap-4 p-4">
-        <Input
-          label="Email"
-          onError={formik.errors.email}
-          value={formik.values.email}
-          onChange={formik.handleChange('email')}
-        />
+    <div className="flex h-dvh">
+      <div className="h-full w-3/4 items-center justify-center border-r bg-[#f8f8f8]">
+        <img src={'/logo_flit.png'} alt="Logo Flit" />
+      </div>
+      <div className="flex w-full flex-col items-center justify-center">
+        <form onSubmit={formik.handleSubmit} className="flex w-full max-w-xl flex-col gap-4">
+          <div>
+            <Button
+              onClick={() => navigate(ROUTES.NO_AUTH.SIGN_IN)}
+              lefIcon={<ArrowLeft className="mr-2 size-4 justify-self-start" />}
+              label="Voltar"
+              variant="link"
+            />
+          </div>
+          <h1 className="self-start text-5xl font-bold text-slate-600">Esqueceu a senha?</h1>
+          <h3 className="mb-6 self-start text-lg font-normal text-slate-400">
+            Informe o email que te ajudamos a redefinir.
+          </h3>
+          <Input
+            label="Email"
+            onError={formik.errors.email}
+            value={formik.values.email}
+            onChange={formik.handleChange('email')}
+          />
 
-        <Button onClick={() => formik.handleSubmit()} label="Entrar" />
-      </form>
+          <Button type="submit" onClick={() => formik.handleSubmit()} label="Enviar" />
+        </form>
+      </div>
     </div>
   );
 };

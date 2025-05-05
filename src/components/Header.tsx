@@ -6,7 +6,7 @@ export const Header = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex h-16 w-full items-center justify-between bg-slate-300 px-2">
+    <div className="flex h-20 w-full items-center justify-between border-b bg-[#f8f8f8] px-2 shadow-xs">
       <h1>Flit App</h1>
 
       <div className="flex gap-4 md:hidden">

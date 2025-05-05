@@ -10,10 +10,14 @@ export const Sidebar = () => {
   const signOut = useAuth((state) => state.signOut);
 
   return (
-    <div className="flex h-full flex-col gap-2 border-r-2 bg-slate-200">
+    <div className="flex h-full flex-col border-r bg-[#f8f8f8]">
+      <div className="items-center justify-center border-b bg-[#f8f8f8]">
+        <img src={'/logo_flit.png'} alt="Logo Flit" />
+      </div>
+
       <button
         type="button"
-        className="flex cursor-pointer gap-2 p-4 transition-all hover:backdrop-brightness-110"
+        className="flex cursor-pointer gap-2 p-4 font-semibold text-slate-500 transition-all hover:bg-[#518adb] hover:font-bold hover:text-white"
         onClick={() => navigate(ROUTES.AUTHENTICATED.HOME)}
       >
         <Home />
@@ -22,7 +26,7 @@ export const Sidebar = () => {
 
       <button
         type="button"
-        className="flex cursor-pointer gap-2 p-4 transition-all hover:backdrop-brightness-110"
+        className="flex cursor-pointer gap-2 p-4 font-semibold text-slate-500 transition-all hover:bg-[#518adb] hover:font-bold hover:text-white"
         onClick={() => navigate(ROUTES.AUTHENTICATED.EMPLOYEES)}
       >
         <SquareUserRound />
@@ -31,7 +35,7 @@ export const Sidebar = () => {
 
       <button
         type="button"
-        className="flex cursor-pointer gap-2 p-4 transition-all hover:backdrop-brightness-110"
+        className="flex cursor-pointer gap-2 p-4 font-semibold text-slate-500 transition-all hover:bg-[#518adb] hover:font-bold hover:text-white"
         onClick={() => signOut()}
       >
         <LogOut />

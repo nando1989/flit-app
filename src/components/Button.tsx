@@ -50,15 +50,14 @@ export const Button = forwardRef<HTMLButtonElement, IProps>(
     const { onShowMessage } = useMessages();
 
     const bgVariant: Record<TVariants, string> = {
-      default: 'w-full bg-blue-900 cursor-pointer transition-all ease-in-out',
-      outline: 'border-2 dark:text-slate-400 dark:hover:bg-slate-900 dark:text-slate-500',
+      default: 'w-full bg-[#436fad]  hover:bg-[#518adb]  cursor-pointer transition-all ease-in-out',
+      outline: 'border-2 dark:text-slate-400',
       secondary:
         'border bg-gradient-to-br from-slate-200 to-slate-100 transition-all ease-in-out hover:brightness-90 text-slate-700 dark:from-slate-900 dark:to-slate-950 dark:text-slate-500',
       destructive: '',
       ghost: '',
-      link: '',
-      primary:
-        'bg-nort-primary text-slate-700 transition-all ease-in-out hover:brightness-90 dark:from-slate-800 dark:to-slate-600 dark:text-slate-950',
+      link: 'text-slate-600 hover:text-blue-900 transition-all',
+      primary: 'text-slate-700 transition-all ease-in-out bg-[#436fad] hover:bg-[#518adb]',
     };
 
     const fileInputRef = useRef<HTMLInputElement>(null);

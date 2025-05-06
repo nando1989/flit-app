@@ -1,5 +1,6 @@
 import { collection, onSnapshot } from 'firebase/firestore';
-import { NotebookPen } from 'lucide-react';
+import { deleteDoc, doc } from 'firebase/firestore';
+import { NotebookPen, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
@@ -17,6 +18,15 @@ export const Employees = () => {
 
   const [data, setData] = useState<Array<IEmployees>>([]);
   const [search, setSearch] = useState('');
+
+  const handleDeleteEmployee = async (id: string) => {
+    try {
+      await deleteDoc(doc(dbFirestore, FIREBASE.COLLECTIONS.EMPLOYEES, id));
+      alert('Funcionário deletado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao deletar funcionário:', error);
+    }
+  };
 
   useEffect(() => {
     const querySnapshot = onSnapshot(
@@ -66,6 +76,10 @@ export const Employees = () => {
                       navigate(`${ROUTES.AUTHENTICATED.EMPLOYEES_DETAILS}?id=${row.id}`)
                     }
                     className="size-5 cursor-pointer text-slate-500"
+                  />
+                  <Trash2
+                    onClick={() => handleDeleteEmployee(row.id)}
+                    className="size-5 cursor-pointer text-red-600"
                   />
                 </div>
               );

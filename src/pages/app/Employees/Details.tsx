@@ -157,7 +157,7 @@ export const EmployeesDetails = () => {
           {previewAvatar?.url && (
             <button
               type="button"
-              className="mt-2 flex cursor-pointer items-center gap-2 justify-self-end"
+              className="mt-2 flex cursor-pointer flex-col items-center gap-2 justify-self-end"
               onClick={() =>
                 setPreviewAvatar({
                   file: null,

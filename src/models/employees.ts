@@ -9,4 +9,5 @@ export interface IEmployees {
   hireDate: Date;
   document: string;
   address: IAddress;
+  status?: boolean;
 }

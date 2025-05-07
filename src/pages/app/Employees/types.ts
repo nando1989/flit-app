@@ -55,4 +55,6 @@ export const initFormEmployees = {
   city: '',
   state: '',
   hireDate: '',
+  isActive: true,
+  status: true,
 };

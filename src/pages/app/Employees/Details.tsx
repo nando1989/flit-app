@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import dayjs from 'dayjs';
+import { doc, updateDoc } from 'firebase/firestore';
 import { useFormik } from 'formik';
 import { ArrowLeft, SquareUserRound, Trash2 } from 'lucide-react';
 import { useLayoutEffect, useRef, useState } from 'react';
@@ -9,9 +10,11 @@ import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Select } from '@/components/Select';
 import { SelectDate } from '@/components/SelectDate';
+import { ToggleButton } from '@/components/ToggleButton';
 import { formatFirebaseDateToDate, formattedCEP, formattedCPF } from '@/lib/utils';
 import { statesOfBrazil } from '@/models/appTypes';
-import { ROUTES } from '@/paths';
+import { FIREBASE, ROUTES } from '@/paths';
+import { dbFirestore } from '@/service/firebase/configs';
 import { getEmployees, postEmployee } from '@/service/firebase/firestore/employees';
 import { uploadFileStorageFirebase } from '@/service/firebase/storage/storage';
 
@@ -48,6 +51,8 @@ export const EmployeesDetails = () => {
               neighborhood: data?.address.neighborhood ?? '',
               city: data?.address.city ?? '',
               state: data?.address.state ?? '',
+              isActive: data?.isActive ?? true,
+              status: data?.status ?? false,
               hireDate: data?.hireDate
                 ? dayjs(formatFirebaseDateToDate(data?.hireDate)).toString()
                 : '',
@@ -106,6 +111,16 @@ export const EmployeesDetails = () => {
       fileInputRef.current.click();
     }
   };
+
+  const handleStatusChange = async (id: string, newStatus: boolean) => {
+    try {
+      const docRef = doc(dbFirestore, FIREBASE.COLLECTIONS.EMPLOYEES, id);
+      await updateDoc(docRef, { isActive: newStatus });
+    } catch (error) {
+      console.error('Error updating status:', error);
+    }
+  };
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
@@ -153,6 +168,19 @@ export const EmployeesDetails = () => {
               <SquareUserRound className="size-8 text-slate-500" />
             )}
           </button>
+
+          <label className="text-sm font-medium">Status: </label>
+          <ToggleButton
+            isActive={formik.values.isActive}
+            onToggle={async (newStatus) => {
+              if (employeeId) {
+                await handleStatusChange(employeeId, newStatus);
+              }
+              formik.setFieldValue('isActive', newStatus);
+            }}
+            disabled={loading}
+          />
+          <span className="text-sm">{formik.values.isActive ? ' Ativo' : ' Inativo'}</span>
 
           {previewAvatar?.url && (
             <button

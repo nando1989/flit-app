@@ -32,7 +32,7 @@ interface IProps {
   onShowMessage(data: IQuestionProp | IMessageProps): void;
 }
 
-const MessagesContext = createContext({} as IProps); //funçaõ nativado react
+const MessagesContext = createContext({} as IProps);
 
 const initAlertMessage: IQuestionProp | IMessageProps = {
   type: 'MESSAGE',

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import dayjs from 'dayjs';
-import { doc, updateDoc } from 'firebase/firestore';
 import { useFormik } from 'formik';
 import { ArrowLeft, SquareUserRound, Trash2 } from 'lucide-react';
 import { useLayoutEffect, useRef, useState } from 'react';
@@ -10,11 +9,10 @@ import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Select } from '@/components/Select';
 import { SelectDate } from '@/components/SelectDate';
-import { ToggleButton } from '@/components/ToggleButton';
+import { Switch } from '@/components/Switch';
 import { formatFirebaseDateToDate, formattedCEP, formattedCPF } from '@/lib/utils';
 import { statesOfBrazil } from '@/models/appTypes';
-import { FIREBASE, ROUTES } from '@/paths';
-import { dbFirestore } from '@/service/firebase/configs';
+import { ROUTES } from '@/paths';
 import { getEmployees, postEmployee } from '@/service/firebase/firestore/employees';
 import { uploadFileStorageFirebase } from '@/service/firebase/storage/storage';
 
@@ -43,6 +41,7 @@ export const EmployeesDetails = () => {
           .then((data) => {
             if (data?.photoUrl) setPreviewAvatar({ file: null, url: data.photoUrl });
             formik.setValues({
+              isActive: data?.isActive ?? true,
               name: data?.name ?? '',
               email: data?.email ?? '',
               document: data?.document ?? '',
@@ -51,8 +50,6 @@ export const EmployeesDetails = () => {
               neighborhood: data?.address.neighborhood ?? '',
               city: data?.address.city ?? '',
               state: data?.address.state ?? '',
-              isActive: data?.isActive ?? true,
-              status: data?.status ?? false,
               hireDate: data?.hireDate
                 ? dayjs(formatFirebaseDateToDate(data?.hireDate)).toString()
                 : '',
@@ -94,7 +91,7 @@ export const EmployeesDetails = () => {
         document: data.document,
         email: data.email,
         hireDate: data.hireDate as unknown as Date,
-        isActive: true,
+        isActive: data.isActive ?? true,
         name: data.name,
       });
 
@@ -111,16 +108,6 @@ export const EmployeesDetails = () => {
       fileInputRef.current.click();
     }
   };
-
-  const handleStatusChange = async (id: string, newStatus: boolean) => {
-    try {
-      const docRef = doc(dbFirestore, FIREBASE.COLLECTIONS.EMPLOYEES, id);
-      await updateDoc(docRef, { isActive: newStatus });
-    } catch (error) {
-      console.error('Error updating status:', error);
-    }
-  };
-
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
@@ -144,8 +131,13 @@ export const EmployeesDetails = () => {
         variant="link"
         className="mb-2 self-start"
       />
-      <form onSubmit={formik.handleSubmit} className="grid w-full max-w-xl gap-2">
-        <div className="col-span-1 col-start-2 mb-4">
+      <form onSubmit={formik.handleSubmit} className="grid w-full max-w-4xl gap-2">
+        <Switch
+          checked={formik.values.isActive}
+          onChange={(v) => formik.setFieldValue('isActive', v)}
+          label="Status:"
+        />
+        <div className="col-span-1 mb-4">
           <button
             type="button"
             className="flex h-20 w-20 cursor-pointer items-center justify-center justify-self-end rounded-lg border bg-slate-200 hover:opacity-80"
@@ -169,23 +161,10 @@ export const EmployeesDetails = () => {
             )}
           </button>
 
-          <label className="text-sm font-medium">Status: </label>
-          <ToggleButton
-            isActive={formik.values.isActive}
-            onToggle={async (newStatus) => {
-              if (employeeId) {
-                await handleStatusChange(employeeId, newStatus);
-              }
-              formik.setFieldValue('isActive', newStatus);
-            }}
-            disabled={loading}
-          />
-          <span className="text-sm">{formik.values.isActive ? ' Ativo' : ' Inativo'}</span>
-
           {previewAvatar?.url && (
             <button
               type="button"
-              className="mt-2 flex cursor-pointer flex-col items-center gap-2 justify-self-end"
+              className="mt-2 flex cursor-pointer items-center gap-2 justify-self-end"
               onClick={() =>
                 setPreviewAvatar({
                   file: null,
@@ -205,7 +184,8 @@ export const EmployeesDetails = () => {
           onError={formik.errors.name}
           onChange={formik.handleChange('name')}
           label="Nome:"
-          className="col-span-1"
+          className="col-span-2 sm:col-span-1"
+          placeholder="Informe o nome"
         />
         <Input
           disabled={loading}
@@ -213,7 +193,8 @@ export const EmployeesDetails = () => {
           onError={formik.errors.email}
           onChange={formik.handleChange('email')}
           label="Email:"
-          className="col-span-1"
+          placeholder="Informe o email"
+          className="col-span-2 sm:col-span-1"
         />
         <Input
           disabled={loading}
@@ -221,13 +202,14 @@ export const EmployeesDetails = () => {
           onError={formik.errors.document}
           onChange={(v) => formik.setFieldValue('document', formattedCPF(v))}
           label="CPF:"
-          className="col-span-1"
+          placeholder="Informe o cpf"
+          className="col-span-2 sm:col-span-1"
         />
         <SelectDate
           value={formik.values.hireDate as any}
           onChange={(v) => formik.setFieldValue('hireDate', v)}
           label="Data de Contratação:"
-          className="col-span-1"
+          className="col-span-2 sm:col-span-1"
         />
 
         <span className="col-span-2 mt-4 mb-2 border-b pb-2">Endereço</span>
@@ -237,6 +219,7 @@ export const EmployeesDetails = () => {
           onError={formik.errors.street}
           onChange={formik.handleChange('street')}
           label="Rua:"
+          placeholder="Informe o nome da rua"
           className="col-span-2"
         />
         <Input
@@ -245,6 +228,8 @@ export const EmployeesDetails = () => {
           onError={formik.errors.zipCode}
           onChange={(v) => formik.setFieldValue('zipCode', formattedCEP(v))}
           label="CEP:"
+          placeholder="Informe o cep"
+          className="col-span-2 sm:col-span-1"
         />
         <Input
           disabled={loading}
@@ -252,6 +237,8 @@ export const EmployeesDetails = () => {
           onError={formik.errors.neighborhood}
           onChange={formik.handleChange('neighborhood')}
           label="Bairro:"
+          placeholder="Informe o bairro"
+          className="col-span-2 sm:col-span-1"
         />
         <Select
           disabled={loading}
@@ -259,6 +246,8 @@ export const EmployeesDetails = () => {
           onError={formik.errors.state}
           onChange={formik.handleChange('state')}
           label="Estado:"
+          placeholder="Selecione o estado"
+          className="col-span-2 sm:col-span-1"
           options={statesOfBrazil}
         />
         <Input
@@ -267,12 +256,20 @@ export const EmployeesDetails = () => {
           onError={formik.errors.city}
           onChange={formik.handleChange('city')}
           label="Cidade:"
+          placeholder="Informe a cidade"
+          className="col-span-2 sm:col-span-1"
         />
 
         <div className="col-span-2 mt-6 mb-2 border" />
 
-        <div className="col-span-1 col-start-2 flex gap-4">
-          <Button disabled={loading} className="h-10 w-full" variant="secondary" label="Cancelar" />
+        <div className="col-span-2 flex gap-4 sm:col-span-1 sm:col-start-2">
+          <Button
+            onClick={() => !loading && navigate(ROUTES.AUTHENTICATED.EMPLOYEES)}
+            disabled={loading}
+            className="h-10 w-full"
+            variant="secondary"
+            label="Cancelar"
+          />
           <Button
             isLoading={loading}
             onClick={() => formik.handleSubmit()}

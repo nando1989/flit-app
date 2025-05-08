@@ -1,14 +1,14 @@
 import { useNavigate } from 'react-router';
 
 import { ROUTES } from '@/paths';
+import { useAuth } from '@/store/useAuth';
 
 export const Header = () => {
   const navigate = useNavigate();
+  const signOut = useAuth((state) => state.signOut);
 
   return (
     <div className="flex h-20 w-full items-center justify-between border-b bg-[#f8f8f8] px-2 shadow-xs">
-      <h1>Flit App</h1>
-
       <div className="flex gap-4 md:hidden">
         <button
           onClick={() => navigate(ROUTES.AUTHENTICATED.HOME)}
@@ -25,7 +25,7 @@ export const Header = () => {
           <h1>Funcionarios</h1>
         </button>
         <button
-          onClick={() => navigate(ROUTES.AUTHENTICATED.EMPLOYEES_DETAILS)}
+          onClick={() => signOut()}
           type="button"
           className="flex h-16 cursor-pointer items-center px-2 transition-all hover:backdrop-brightness-110"
         >

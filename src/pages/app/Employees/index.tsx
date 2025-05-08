@@ -1,5 +1,4 @@
 import { collection, onSnapshot } from 'firebase/firestore';
-import { deleteDoc, doc } from 'firebase/firestore';
 import { NotebookPen, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -7,15 +6,19 @@ import { useNavigate } from 'react-router';
 import { Button } from '@/components/Button';
 import { DataTable } from '@/components/DataTable';
 import { Input } from '@/components/Input';
-import { ToggleStatusIndicator } from '@/components/ToggleStatus';
+import { useMessages } from '@/hook/useMessages';
 import { IEmployees } from '@/models/employees';
 import { FIREBASE, ROUTES } from '@/paths';
 import { dbFirestore } from '@/service/firebase/configs';
+import { deleteEmployee } from '@/service/firebase/firestore/employees';
+import { getFirebaseErrorMessageTranslation } from '@/service/firebase/translate';
 
 import { employeesColumns } from './types';
 
 export const Employees = () => {
   const navigate = useNavigate();
+  const { onShowMessage } = useMessages();
+
   const [data, setData] = useState<Array<IEmployees>>([]);
   const [search, setSearch] = useState('');
 
@@ -24,32 +27,38 @@ export const Employees = () => {
       collection(dbFirestore, FIREBASE.COLLECTIONS.EMPLOYEES),
       (snapshot) => {
         const employees: Array<IEmployees> = [];
+
         snapshot.forEach((doc) => {
-          employees.push(Object.assign(doc.data(), { id: doc.id }) as IEmployees);
+          employees.push({
+            id: doc.id,
+            ...doc.data(),
+          } as IEmployees);
         });
+
         setData(employees);
       },
     );
+
     return () => querySnapshot();
   }, []);
 
-  const handleDeleteEmployee = async (id: string) => {
-    try {
-      await deleteDoc(doc(dbFirestore, FIREBASE.COLLECTIONS.EMPLOYEES, id));
-      alert('Funcionário deletado com sucesso!');
-    } catch (error) {
-      console.error('Erro ao deletar funcionário:', error);
-    }
+  const handleDeleteEmployees = async (employeeId: string) => {
+    await deleteEmployee(employeeId).catch((err) => {
+      onShowMessage({
+        title: 'Atenção!',
+        buttonText: 'Ok',
+        description: getFirebaseErrorMessageTranslation(
+          err,
+          'Não foi possivel remover este funcionarios',
+        ),
+        isVisible: true,
+        type: 'MESSAGE',
+      });
+    });
   };
 
-  const filteredData = data.filter(
-    (employee) =>
-      employee.email.toLowerCase().includes(search.toLowerCase()) ||
-      employee.document.toLowerCase().includes(search.toLowerCase()),
-  );
-
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex h-full flex-col gap-4">
       <div className="grid grid-cols-12 items-end gap-4">
         <Input value={search} onChange={setSearch} className="col-span-9" label="Pesquisar" />
         <Button
@@ -60,24 +69,45 @@ export const Employees = () => {
       </div>
 
       <div className="flex w-full flex-1">
-        <div className="w-full rounded-lg border bg-white">
+        <div className="h-full w-full rounded-lg border bg-white">
           <DataTable
-            data={filteredData}
+            data={data.filter(
+              (v) =>
+                v.email.toLowerCase().includes(search.toLowerCase()) ||
+                v.name.toLowerCase().includes(search.toLowerCase()) ||
+                v.document.toLowerCase().includes(search.toLowerCase()),
+            )}
             columns={employeesColumns}
             pagination
-            onAction={(row) => (
-              <div className="flex gap-4">
-                <ToggleStatusIndicator isActive={row.Active} />
-                <NotebookPen
-                  onClick={() => navigate(`${ROUTES.AUTHENTICATED.EMPLOYEES_DETAILS}?id=${row.id}`)}
-                  className="size-5 cursor-pointer text-slate-500"
-                />
-                <Trash2
-                  onClick={() => handleDeleteEmployee(row.id)}
-                  className="size-5 cursor-pointer text-red-600"
-                />
-              </div>
-            )}
+            onAction={(row) => {
+              return (
+                <div className="flex gap-4">
+                  <div className="flex gap-4">
+                    <NotebookPen
+                      onClick={() =>
+                        navigate(`${ROUTES.AUTHENTICATED.EMPLOYEES_DETAILS}?id=${row.id}`)
+                      }
+                      className="size-5 cursor-pointer text-slate-500"
+                    />
+                  </div>
+                  <div className="flex gap-4">
+                    <Trash2
+                      onClick={() =>
+                        onShowMessage({
+                          isVisible: true,
+                          type: 'QUESTION',
+                          onConfirm: () => handleDeleteEmployees(row.id),
+                          title: 'Atenção!',
+                          messageType: 'error',
+                          description: 'Deseja realmente remover este funcionario?',
+                        })
+                      }
+                      className="size-5 cursor-pointer text-slate-500"
+                    />
+                  </div>
+                </div>
+              );
+            }}
           />
         </div>
       </div>

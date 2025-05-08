@@ -9,7 +9,7 @@ export const AppLayout = ({ children }: React.PropsWithChildren) => {
       </div>
       <div className="flex w-full flex-col overflow-auto">
         <Header />
-        <div className="p-4">{children}</div>
+        <div className="h-full p-4">{children}</div>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { addDoc, collection, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
 
 import { IEmployees } from '@/models/employees';
 import { FIREBASE } from '@/paths';
@@ -33,4 +33,9 @@ export const postEmployee = async (payload: IEmployees) => {
       updatedAt: dayjs().toDate(),
     });
   }
+};
+
+export const deleteEmployee = async (employeeId: string) => {
+  const docRef = doc(dbFirestore, FIREBASE.COLLECTIONS.EMPLOYEES, employeeId);
+  await deleteDoc(docRef);
 };
